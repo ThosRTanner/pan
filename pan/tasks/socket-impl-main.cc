@@ -26,9 +26,9 @@
 ****  GIOChannel::SocketCreator -- create a socket in a worker thread
 ***/
 
+#include "socket-impl-main.h"
+
 #include <string>
-//#include <glib/giochannel.h>
-//#include <glib/gstring.h>
 
 #include <glib.h>
 
@@ -50,7 +50,6 @@
 #include <pan/general/macros.h>
 #include <pan/general/worker-pool.h>
 #include <pan/general/string-view.h>
-#include "socket-impl-main.h"
 
 #ifdef G_OS_WIN32
   #undef _WIN32_WINNT
@@ -59,10 +58,53 @@
   #undef gai_strerror
 #endif
 
-using namespace pan;
+namespace pan {
 
-namespace
-{
+#ifdef G_OS_WIN32
+bool has_getaddrinfo{false};
+#endif
+
+namespace {
+
+  static void ensure_module_init (void)
+  {
+#ifdef G_OS_WIN32
+    static bool inited (false);
+
+    if (!inited)
+    {
+      WSADATA wsaData;
+      WSAStartup(MAKEWORD(2,2), &wsaData);
+
+      char sysdir[MAX_PATH], path[MAX_PATH+8];
+
+      if(GetSystemDirectory(sysdir,MAX_PATH)!=0)
+      {
+        HMODULE lib=NULL;
+        FARPROC pfunc=NULL;
+        const char *libs[]={"ws2_32","wship6",NULL};
+
+        for(const char **p=libs;*p!=NULL;++p)
+        {
+          g_snprintf(path,MAX_PATH+8,"%s\\%s",sysdir,*p);
+          lib=LoadLibrary(path);
+          if(!lib)
+            continue;
+          pfunc=GetProcAddress(lib,"getaddrinfo");
+          if(!pfunc)
+          {
+            FreeLibrary(lib);
+            lib=NULL;
+            continue;
+          }
+          has_getaddrinfo=true;
+          break;
+        }
+      }
+      inited = true;
+    }
+#endif
+  }
 
   struct ThreadWorker : public WorkerPool::Worker,
                         public WorkerPool::Worker::Listener
@@ -152,3 +194,5 @@ void
 SocketCreator :: on_valid_cert_added (gnutls_x509_crt_t cert, std::string server)
 {}
 #endif
+
+}

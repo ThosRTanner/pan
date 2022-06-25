@@ -22,6 +22,7 @@
 /******
 *******
 ******/
+#include "socket-impl-gio.h"
 
 #include <config.h>
 #include <iostream>
@@ -89,15 +90,9 @@ extern "C" {
 #include <pan/general/log.h>
 #include <pan/general/string-view.h>
 #include <pan/usenet-utils/gnksa.h>
-#include "socket-impl-gio.h"
 #include "socket-impl-main.h"
 
-using namespace pan;
-
-#ifndef G_OS_WIN32
-extern t_getaddrinfo p_getaddrinfo;
-extern t_freeaddrinfo p_freeaddrinfo;
-#endif
+namespace pan {
 
 namespace
 {
@@ -119,7 +114,7 @@ namespace
     g_snprintf (hpbuf,sizeof(hpbuf),"%s:%s",host_in.str,portbuf);
 
 #ifdef G_OS_WIN32 // windows might not have getaddrinfo...
-    if (!p_getaddrinfo)
+    if (!has_getaddrinfo)
     {
       struct hostent * ans = isalpha (host[0])
         ? gethostbyname (host.c_str())
@@ -501,4 +496,6 @@ GIOChannelSocket :: set_watch_mode (WatchMode mode)
   }
 
   debug ("set_watch_mode " << mode << ": _tag_watch is now " << _tag_watch);
+}
+
 }

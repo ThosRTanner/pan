@@ -24,16 +24,8 @@
 #ifndef __SocketMAIN_h__
 #define __SocketMAIN_h__
 
-#ifdef G_OS_WIN32
-  #include <ws2tcpip.h>
-#else
-  #include <signal.h>
-  #include <sys/types.h>
-  #include <sys/socket.h>
-  #include <netinet/in.h>
-  #include <netdb.h>
-  #include <arpa/inet.h>
-#endif
+//For G_OS_WIN32 :-(
+#include <glib.h>
 
 #include <pan/general/string-view.h>
 #include <pan/general/worker-pool.h>
@@ -47,76 +39,12 @@
 #include <pan/data/cert-store.h>
 #include "socket-impl-gio.h"
 
-namespace
-{
-  typedef int (*t_getaddrinfo)(const char *,const char *, const struct addrinfo*, struct addrinfo **);
-  typedef void (*t_freeaddrinfo)(struct addrinfo*);
-}
 
-namespace
-{
-
-  static t_getaddrinfo p_getaddrinfo (0);
-  static t_freeaddrinfo p_freeaddrinfo (0);
-
-  static void ensure_module_init (void)
-  {
-    static bool inited (false);
-
-    if (!inited)
-    {
-      p_freeaddrinfo=NULL;
-      p_getaddrinfo=NULL;
+namespace pan {
 
 #ifdef G_OS_WIN32
-      WSADATA wsaData;
-      WSAStartup(MAKEWORD(2,2), &wsaData);
-
-      char sysdir[MAX_PATH], path[MAX_PATH+8];
-
-      if(GetSystemDirectory(sysdir,MAX_PATH)!=0)
-      {
-        HMODULE lib=NULL;
-        FARPROC pfunc=NULL;
-        const char *libs[]={"ws2_32","wship6",NULL};
-
-        for(const char **p=libs;*p!=NULL;++p)
-        {
-          g_snprintf(path,MAX_PATH+8,"%s\\%s",sysdir,*p);
-          lib=LoadLibrary(path);
-          if(!lib)
-            continue;
-          pfunc=GetProcAddress(lib,"getaddrinfo");
-          if(!pfunc)
-          {
-            FreeLibrary(lib);
-            lib=NULL;
-            continue;
-          }
-          p_getaddrinfo=reinterpret_cast<t_getaddrinfo>(pfunc);
-          pfunc=GetProcAddress(lib,"freeaddrinfo");
-          if(!pfunc)
-          {
-            FreeLibrary(lib);
-            lib=NULL;
-            p_getaddrinfo=NULL;
-            continue;
-          }
-          p_freeaddrinfo=reinterpret_cast<t_freeaddrinfo>(pfunc);
-          break;
-        }
-      }
-#else
-      p_freeaddrinfo=::freeaddrinfo;
-      p_getaddrinfo=::getaddrinfo;
+  extern bool has_getaddrinfo;
 #endif
-      inited = true;
-    }
-  }
-}
-
-namespace pan
-{
 
   class SocketCreator:
     private CertStore::Listener,

@@ -105,11 +105,6 @@ extern "C" {
 
 using namespace pan;
 
-#ifndef G_OS_WIN32
-extern t_getaddrinfo p_getaddrinfo;
-extern t_freeaddrinfo p_freeaddrinfo;
-#endif
-
 /****
 *****
 *****
@@ -159,7 +154,7 @@ GIOChannelSocketGnuTLS :: create_channel (const StringView& host_in, int port, s
   g_snprintf (hpbuf,sizeof(hpbuf),"%s:%s",host_in.str,portbuf);
 
 #ifdef G_OS_WIN32 // windows might not have getaddrinfo...
-  if (!p_getaddrinfo)
+  if (!has_getaddrinfo)
   {
     struct hostent * ans = isalpha (host[0])
       ? gethostbyname (host.c_str())
