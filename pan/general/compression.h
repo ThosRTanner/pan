@@ -36,11 +36,6 @@ namespace pan
     HEADER_COMPRESS_DIABLO = 3
   };
 
-
-
-  const static char* COMPRESS_GZIP = "[COMPRESS=GZIP]";
-  const static char* ENABLE_COMPRESS_GZIP = "XFEATURE COMPRESS GZIP\r\n";
-
   namespace compression
   {
     bool inflate_zlib(std::stringstream *source, std::stringstream *dest,

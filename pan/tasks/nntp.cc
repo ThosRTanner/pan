@@ -34,6 +34,9 @@ namespace pan {
 
 namespace
 {
+   const static char* COMPRESS_GZIP = "[COMPRESS=GZIP]";
+   const static char* ENABLE_COMPRESS_GZIP = "XFEATURE COMPRESS GZIP\r\n";
+
    std::string
    build_command (const char * fmt, ...)
    {
@@ -335,18 +338,6 @@ NNTP :: on_socket_error (Socket * sock UNUSED)
    _socket_error = true;
    fire_done_func (ERR_NETWORK, StringView());
 }
-
-/*
-namespace
-{
-   void
-   ensure_trailing_crlf (GString * g)
-   {
-      if (g->len<2 || g->str[g->len-2]!='\r' || g->str[g->len-1]!='\n')
-         g_string_append (g, "\r\n");
-   }
-};
-*/
 
 void
 NNTP :: write_next_command ()
