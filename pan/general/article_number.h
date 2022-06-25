@@ -22,10 +22,7 @@ class Article_Count
 
     explicit Article_Count(StringView const &);
 
-    Article_Count(Article_Count const &rhs) :
-      val_(rhs.val_)
-    {
-    }
+    Article_Count(Article_Count const &rhs) = default;
 
     explicit operator type () const { return val_; }
 
@@ -127,10 +124,7 @@ class Article_Number {
 
     explicit Article_Number(StringView const &);
 
-    Article_Number(Article_Number const &rhs) :
-      val_(rhs.val_)
-    {
-    }
+    Article_Number(Article_Number const &rhs) = default;
 
     explicit operator type () const { return val_; }
 
