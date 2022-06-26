@@ -112,12 +112,6 @@ namespace pan
 
   extern iconv_t conv;
   extern bool iconv_inited;
-
-  static char * __g_mime_iconv_strdup (iconv_t cd, const char *str, const char* charset=0)
-  {
-    return g_mime_iconv_strndup(cd, str, strlen(str));
-  }
-
 }
 
 

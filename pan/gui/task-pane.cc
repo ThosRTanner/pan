@@ -577,7 +577,7 @@ namespace
     // get the description
     const std::string description (task->describe ());
 
-    const char * descr = iconv_inited ? __g_mime_iconv_strdup(conv, description.c_str()) : description.c_str();
+    const char * descr = iconv_inited ? g_mime_iconv_strdup(conv, description.c_str()) : description.c_str();
 
     std::string status (state_str);
 

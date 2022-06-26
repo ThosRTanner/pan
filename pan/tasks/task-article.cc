@@ -51,7 +51,7 @@ namespace
 
     const char* str = stripped.c_str();
     iconv_t c = iconv_open("UTF-8","UTF-8");
-    char * res = __g_mime_iconv_strdup(c, str);
+    char * res = g_mime_iconv_strdup(c, str);
     iconv_close(c);
 
     char buf[1024];
