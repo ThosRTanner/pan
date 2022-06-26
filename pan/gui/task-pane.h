@@ -90,9 +90,9 @@ namespace pan
       static void root_destroyed_cb (GtkWidget, gpointer);
 
     public:
-      static void do_popup_menu (GtkWidget*, GdkEventButton *event, gpointer pane_g);
+      static void do_popup_menu(GdkEventButton *event, gpointer pane_g);
       static gboolean on_button_pressed (GtkWidget * treeview, GdkEventButton *event, gpointer userdata);
-      void add_actions (GtkWidget * box);
+      void add_actions ();
       void change_destination (const tasks_t& tasks);
 
     private:

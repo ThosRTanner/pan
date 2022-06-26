@@ -37,7 +37,7 @@ namespace
 
 #if !GTK_CHECK_VERSION(3, 0, 0)
 static inline GdkWindow * gdk_window_get_device_position (GdkWindow *window,
-                                                           GdkDevice *device,
+                                                           GdkDevice */*device*/,
                                                            gint *x,
                                                            gint *y,
                                                            GdkModifierType *mask)

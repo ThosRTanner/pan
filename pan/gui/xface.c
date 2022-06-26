@@ -1055,7 +1055,7 @@ uncompface(char * fbuf)
 
 /** end uncompface.c */
 
-static void destroy( guchar * m, gpointer p)
+static void destroy( guchar * m, gpointer /*p*/)
 {
   g_free(m);
 }

@@ -154,7 +154,7 @@ TaskPane :: show_task_info(const tasks_t& tasks)
   if (!task) return;
 
   char buffer[4096];
-  const bool task_found (fill_task_info (task, buffer, sizeof(buffer)));
+  (void)fill_task_info (task, buffer, sizeof(buffer));
 
   GtkWidget * w = gtk_message_dialog_new_with_markup (
       GTK_WINDOW (gtk_widget_get_toplevel (_root)),
@@ -207,7 +207,7 @@ TaskPane:: on_tooltip_query(GtkWidget  *widget,
 }
 
 void
-TaskPane::  do_popup_menu (GtkWidget *treeview, GdkEventButton *event, gpointer userdata)
+TaskPane::  do_popup_menu(GdkEventButton *event, gpointer userdata)
 {
   TaskPane * self (static_cast<TaskPane*>(userdata));
   GtkWidget * menu (gtk_ui_manager_get_widget (self->_uim, "/taskpane-popup"));
@@ -242,7 +242,7 @@ TaskPane :: on_button_pressed (GtkWidget *treeview, GdkEventButton *event, gpoin
            gtk_tree_path_free(path);
          }
       }
-      do_popup_menu(treeview, event, userdata);
+      do_popup_menu(event, userdata);
       return true;
     }
 
@@ -294,8 +294,6 @@ void TaskPane :: restart_clicked_cb (GtkButton*, TaskPane* pane)
 std::string
 TaskPane :: prompt_user_for_new_dest (GtkWindow * parent, const Quark& current_path)
 {
-  char buf[4096];
-  struct stat sb;
   std::string path;
 
   std::string prev_path(current_path.c_str());
@@ -724,7 +722,7 @@ namespace
 }
 
 void
-TaskPane :: add_actions (GtkWidget * box)
+TaskPane :: add_actions()
 {
   // action manager for popup
   _uim = gtk_ui_manager_new ();
@@ -754,9 +752,9 @@ TaskPane :: add_actions (GtkWidget * box)
 
 namespace
 {
-  gboolean on_popup_menu (GtkWidget * treeview, gpointer userdata)
+  gboolean on_popup_menu (GtkWidget */*treeview*/, gpointer userdata)
   {
-    TaskPane::do_popup_menu (treeview, NULL, userdata);
+    TaskPane::do_popup_menu(NULL, userdata);
     return true;
   }
 }
@@ -910,7 +908,7 @@ namespace
     }
   }
 
-  gboolean filter_visible_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer gdata)
+  gboolean filter_visible_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer /*gdata*/)
   {
 
      if (search_text.empty()) return true;
@@ -1090,7 +1088,7 @@ TaskPane :: TaskPane (Queue& queue, Prefs& prefs): _queue(queue), _prefs(prefs)
   g_signal_connect (_view, "button-press-event", G_CALLBACK(on_button_pressed), this);
 
   // actions
-  add_actions(_view);
+  add_actions();
   gtk_window_add_accel_group (GTK_WINDOW(_root), gtk_ui_manager_get_accel_group (_uim));
 
   // search filter

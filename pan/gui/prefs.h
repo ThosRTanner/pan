@@ -48,8 +48,8 @@ namespace pan
         virtual void on_prefs_int_changed (const StringView& key, int color) = 0;
         virtual void on_prefs_string_changed (const StringView& key, const StringView& value) = 0;
         virtual void on_prefs_color_changed (const StringView& key, const GdkColor& color) = 0;
-        virtual void on_prefs_hotkey_changed (const StringView& key, const StringView& value) {}
-        virtual void on_prefs_long64_changed(const StringView& key, const uint64_t& value) {}
+        virtual void on_prefs_hotkey_changed (const StringView& /*key*/, const StringView& /*value*/) {}
+        virtual void on_prefs_long64_changed(const StringView& /*key*/, const uint64_t& /*value*/) {}
       };
       void add_listener (Listener* l) { _listeners.insert(l); }
       void remove_listener (Listener* l) {_listeners.erase(l); }
