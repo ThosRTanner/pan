@@ -143,9 +143,9 @@ namespace pan
     CertStore (Data&) {};
     virtual ~CertStore () {};
 
-    void add_listener (void * l) {}
-    void remove_listener (void * l) {}
-    bool in_blacklist (const Quark& s) { return false; }
+    void add_listener (void * /*l*/) {}
+    void remove_listener (void * /*l*/) {}
+    bool in_blacklist (const Quark& /*s*/) { return false; }
 
     struct Listener
     {

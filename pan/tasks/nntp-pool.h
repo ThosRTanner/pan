@@ -89,7 +89,7 @@ private:
 private:
 	// Socket::Creator::Listener
 	virtual void on_socket_created(const StringView& host, int port, bool ok,	Socket*);
-	virtual void on_socket_shutdown(const StringView& host, int port, Socket*) {}
+	virtual void on_socket_shutdown(const StringView& /*host*/, int /*port*/, Socket*) {}
 #ifdef HAVE_GNUTLS
 private:
 	// CertStore::Listener
