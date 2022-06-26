@@ -155,7 +155,9 @@ namespace pan
   void do_read_previous_thread         (GtkAction*) { pan_ui->do_read_previous_thread(); }
   void do_read_parent_article          (GtkAction*) { pan_ui->do_read_parent_article(); }
   void do_show_servers_dialog          (GtkAction*) { pan_ui->do_show_servers_dialog(); }
+#ifdef HAVE_GNUTLS
   void do_show_sec_dialog              (GtkAction*) { pan_ui->do_show_sec_dialog(); }
+#endif
   void do_collapse_thread              (GtkAction*) { pan_ui->do_collapse_thread(); }
   void do_expand_thread                (GtkAction*) { pan_ui->do_expand_thread(); }
   void do_plonk                        (GtkAction*) { pan_ui->do_plonk(); }
@@ -712,10 +714,12 @@ namespace pan
         NULL,
         G_CALLBACK(do_about_pan) },
 
+#ifdef HAVE_GNUTLS
       { "show-sec-dialog", GTK_STOCK_DIALOG_AUTHENTICATION,
         N_("Edit _SSL Certificates"), NULL,
         NULL,
         G_CALLBACK(do_show_sec_dialog) }
+#endif
      };
 
   void prefs_toggle_callback_impl (GtkToggleAction * action)

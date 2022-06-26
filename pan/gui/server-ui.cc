@@ -17,6 +17,8 @@
  *
  */
 
+#include "server-ui.h"
+
 #include <config.h>
 #include <cstdlib>
 #include <cstring>
@@ -31,7 +33,6 @@
 #include <pan/general/quark.h>
 #include <pan/data/data.h>
 #include <pan/usenet-utils/ssl-utils.h>
-#include "server-ui.h"
 #include "pad.h"
 #include "hig.h"
 #include "gtk-compat.h"
@@ -50,7 +51,7 @@
 #endif /* GTK_CHECK_VERSION(3,0,0) */
 #endif
 
-using namespace pan;
+namespace pan {
 
 /************
 *************  EDIT DIALOG
@@ -106,10 +107,10 @@ namespace
     gtk_adjustment_set_value (a, i);
   }
 
+#ifdef HAVE_GNUTLS
   void ssl_changed_cb(GtkComboBox* w, ServerEditDialog* d)
   {
     int ssl(0);
-#ifdef HAVE_GNUTLS
     GtkTreeIter iter;
     if (gtk_combo_box_get_active_iter (w, &iter))
       gtk_tree_model_get (gtk_combo_box_get_model(w), &iter, 1, &ssl, -1);
@@ -122,8 +123,8 @@ namespace
       gtk_widget_show(d->always_trust_checkbox);
     }
     pan_spin_button_set (d->port_spin, ssl == 0 ? STD_NNTP_PORT : STD_SSL_PORT);
-#endif
   }
+#endif
 
   void
   edit_dialog_populate (Data&, Prefs& prefs, const Quark& server, ServerEditDialog * d)
@@ -134,7 +135,10 @@ namespace
 
     d->server = server;
 
-    int port(STD_NNTP_PORT), max_conn(4), age(31*3), rank(1), ssl(0), trust(0);
+    int port(STD_NNTP_PORT), max_conn(4), age(31*3), rank(1), trust(0);
+    #ifdef HAVE_GNUTLS
+    int ssl{0};
+    #endif
     CompressionType compression(HEADER_COMPRESS_NONE);
     std::string addr, user, cert;
     gchar* pass(NULL);
@@ -144,7 +148,9 @@ namespace
       age = d->data.get_server_article_expiration_age (server);
       rank = d->data.get_server_rank (server);
       max_conn = d->data.get_server_limits (server);
+#ifdef HAVE_GNUTLS
       ssl = d->data.get_server_ssl_support(server);
+#endif
       cert = d->data.get_server_cert(server);
       d->data.get_server_trust (server, trust);
       d->data.get_server_compression_type (server, compression);
@@ -308,7 +314,7 @@ namespace
 }
 
 std::string
-pan :: import_sec_from_disk_dialog_new (Data& data, Queue& queue, GtkWindow * window)
+import_sec_from_disk_dialog_new(GtkWindow * window)
 {
   std::string prev_path = g_get_home_dir ();
   std::string res;
@@ -333,9 +339,9 @@ pan :: import_sec_from_disk_dialog_new (Data& data, Queue& queue, GtkWindow * wi
   return res;
 }
 
+#ifdef HAVE_GNUTLS
 namespace
 {
-
   static void server_edit_dialog_realized_cb (GtkWidget*, gpointer gp)
   {
     ServerEditDialog * d (static_cast<ServerEditDialog*>(gp));
@@ -343,9 +349,10 @@ namespace
     g_signal_connect(d->ssl_combo, "changed", G_CALLBACK(ssl_changed_cb), d);
   }
 }
+#endif
 
 GtkWidget*
-pan :: server_edit_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow * window, const Quark& server)
+server_edit_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow * window, const Quark& server)
 {
   ServerEditDialog * d (new ServerEditDialog (data, queue, prefs));
 
@@ -520,6 +527,7 @@ pan :: server_edit_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow
   return d->dialog;
 }
 
+#ifdef HAVE_GNUTLS
 namespace
 {
   enum
@@ -537,7 +545,7 @@ namespace
     { icon_cert,   0 }
   };
 }
-
+#endif
 
 /************
 *************  LIST DIALOG
@@ -590,29 +598,6 @@ namespace
     return server;
   }
 
-  Quark
-  get_selected_server_name (ServerListDialog * d)
-  {
-    g_assert (d != 0);
-
-    Quark server;
-
-    GtkTreeSelection * selection (gtk_tree_view_get_selection(GTK_TREE_VIEW (d->server_tree_view)));
-    GtkTreeModel * model;
-    GtkTreeIter iter;
-    if (gtk_tree_selection_get_selected (selection, &model, &iter)) {
-      char * host (0);
-      gtk_tree_model_get (model, &iter, COL_HOST, &host, -1);
-      if (host) {
-        server = host;
-        g_free (host);
-      }
-    }
-
-    //std::cerr << LINE_ID << " selected server is " << server << std::endl;
-    return server;
-  }
-
   void
   button_refresh (ServerListDialog * d)
   {
@@ -655,12 +640,14 @@ namespace
     delete (ServerListDialog*)p;
   }
 
+#ifdef HAVE_GNUTLS
   void delete_sec_dialog (gpointer p)
   {
    for (guint i=0; i<ICON_QTY; ++i)
       g_object_unref (_icons[i].pixbuf);
    delete (ServerListDialog*)p;
   }
+#endif
 
   void
   server_list_dialog_response_cb (GtkDialog * dialog, int, gpointer)
@@ -773,7 +760,7 @@ namespace
       if (cert)
       {
         pretty_print_x509(buf,sizeof(buf),addr, cert, false);
-        if (!buf) g_snprintf(buf,sizeof(buf), "%s", _("No information available.")) ;
+        g_snprintf(buf,sizeof(buf), "%s", _("No information available.")) ;
 
         GtkWidget * w = gtk_message_dialog_new (
         0,
@@ -827,17 +814,6 @@ namespace
       gtk_tree_selection_select_iter (selection, &selected_iter);
   }
 
-  void
-  sec_dialog_destroy_cb (GtkWidget *, gpointer user_data)
-  {
-    if (GTK_IS_WIDGET (user_data))
-    {
-      ServerListDialog * d = (ServerListDialog*) g_object_get_data (G_OBJECT(user_data), "dialog");
-      sec_tree_view_refresh (d);
-    }
-  }
-
-
   /* add a cert from disk, overwriting the current setting for the selected server */
   void
   cert_add_button_clicked_cb (GtkButton *, gpointer user_data)
@@ -845,7 +821,7 @@ namespace
     const Quark empty_quark;
     GtkWidget * list_dialog = GTK_WIDGET (user_data);
     ServerListDialog * d = (ServerListDialog*) g_object_get_data (G_OBJECT(list_dialog), "dialog");
-    std::string ret = import_sec_from_disk_dialog_new (d->data, d->queue, GTK_WINDOW(list_dialog));
+    std::string ret = import_sec_from_disk_dialog_new (GTK_WINDOW(list_dialog));
     const Quark selected_server (get_selected_server (d));
     CertStore& store (d->data.get_certstore());
 
@@ -855,7 +831,6 @@ namespace
       d->data.get_server_addr(selected_server, addr, port);
       if (!store.import_from_file(selected_server, ret.c_str()))
       {
-      _err:
         Log::add_err_va("Error adding certificate of server '%s' to CertStore. Check the console output!", addr.c_str());
         file::print_file_info(std::cerr,ret.c_str());
       }
@@ -904,7 +879,7 @@ namespace
 #endif
 
 GtkWidget*
-pan :: server_list_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
+server_list_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
 {
   ServerListDialog * d = new ServerListDialog (data, queue, prefs);
 
@@ -978,9 +953,9 @@ pan :: server_list_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow
   return d->dialog;
 }
 
-
+#ifdef HAVE_GNUTLS
 void
-pan :: render_cert_flag (GtkTreeViewColumn * ,
+render_cert_flag (GtkTreeViewColumn * ,
                          GtkCellRenderer   * renderer,
                          GtkTreeModel      * model,
                          GtkTreeIter       * iter,
@@ -993,9 +968,8 @@ pan :: render_cert_flag (GtkTreeViewColumn * ,
 
 
 GtkWidget*
-pan :: sec_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
+sec_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
 {
-#ifdef HAVE_GNUTLS
   ServerListDialog * d = new ServerListDialog (data, queue, prefs);
 
   for (guint i=0; i<ICON_QTY; ++i)
@@ -1074,7 +1048,6 @@ pan :: sec_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent
   sec_tree_view_refresh (d);
   button_refresh (d);
   return d->dialog;
-#else
-  return 0;
+}
 #endif
 }

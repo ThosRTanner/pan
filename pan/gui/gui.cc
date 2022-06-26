@@ -1157,14 +1157,14 @@ void GUI :: do_show_servers_dialog ()
 }
 
 
+#ifdef HAVE_GNUTLS
 void GUI :: do_show_sec_dialog ()
 {
-#ifdef HAVE_GNUTLS
   GtkWidget * w = sec_dialog_new (_data, _queue, _prefs, get_window(_root));
   g_signal_connect (w, "destroy", G_CALLBACK(sec_dialog_destroyed_cb), this);
   gtk_widget_show_all (w);
-#endif
 }
+#endif
 
 void GUI :: do_collapse_thread ()
 {

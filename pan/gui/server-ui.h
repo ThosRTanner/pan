@@ -41,7 +41,7 @@ namespace pan
 
   /** @ingroup GUI */
   std::string
-  import_sec_from_disk_dialog_new (Data& data, Queue& queue, GtkWindow * window);
+  import_sec_from_disk_dialog_new (GtkWindow * window);
 
   /** @ingroup GUI */
   void render_cert_flag (GtkTreeViewColumn * ,

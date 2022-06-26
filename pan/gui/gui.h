@@ -142,7 +142,9 @@ namespace pan
       virtual void do_read_previous_thread ();
       virtual void do_read_parent_article ();
       virtual void do_show_servers_dialog ();
+#ifdef HAVE_GNUTLS
       virtual void do_show_sec_dialog ();
+#endif
       virtual void do_collapse_thread ();
       virtual void do_expand_thread ();
       virtual void do_show_selected_article_info ();
