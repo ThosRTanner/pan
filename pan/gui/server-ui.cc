@@ -78,8 +78,25 @@ namespace
     GtkWidget * compression_combo;
     GtkWidget * ssl_combo;
     GtkWidget * always_trust_checkbox;
-    ServerEditDialog (Data& d, Queue& q, Prefs& p): data(d), queue(q), prefs(p) {}
     CompressionType compressiontype;
+
+    ServerEditDialog (Data& d, Queue& q, Prefs& p):
+      data(d),
+      queue(q),
+      prefs(p),
+      dialog(nullptr),
+      address_entry(nullptr),
+      port_spin(nullptr),
+      auth_username_entry(nullptr),
+      auth_password_entry(nullptr),
+      connection_limit_spin(nullptr),
+      expiration_age_combo(nullptr),
+      rank_combo(nullptr),
+      compression_combo(nullptr),
+      ssl_combo(nullptr),
+      always_trust_checkbox(nullptr),
+      compressiontype(HEADER_COMPRESS_NONE)
+    {}
 
   };
 
@@ -571,7 +588,16 @@ namespace
     GtkListStore * servers_store;
     GtkWidget * remove_button;
     GtkWidget * edit_button;
-    ServerListDialog (Data& d, Queue& q, Prefs& p): data(d), queue(q), prefs(p) {}
+    ServerListDialog (Data& d, Queue& q, Prefs& p):
+      data(d),
+      queue(q),
+      prefs(p),
+      server_tree_view(nullptr),
+      dialog(nullptr),
+      servers_store(nullptr),
+      remove_button(nullptr),
+      edit_button(nullptr)
+    {}
   };
 
 
@@ -1050,4 +1076,6 @@ sec_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
   return d->dialog;
 }
 #endif
+}
+
 }

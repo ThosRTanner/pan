@@ -21,6 +21,8 @@
  * along with this program; if not, see <http://www.gnu.org/licenses/>.
  *
  */
+#include "encoder.h"
+
 #include <config.h>
 #include <algorithm>
 #include <cerrno>
@@ -41,15 +43,21 @@ extern "C" {
 #include <pan/general/file-util.h>
 #include <pan/general/macros.h>
 #include <pan/general/utf8-utils.h>
-#include "encoder.h"
 
-using namespace pan;
+namespace pan {
 
 
 Encoder :: Encoder (WorkerPool& pool):
-  health(OK),
+  parts(0),
+  task(nullptr),
+  bpf(0),
+  cache(nullptr),
+  needed(nullptr),
+  article(nullptr),
+  percent(0.0),
   _worker_pool (pool),
-  _gsourceid (-1)
+  _gsourceid (-1),
+  health(OK),
 {}
 
 
@@ -287,4 +295,6 @@ Encoder :: disable_progress_update ()
     g_source_remove (_gsourceid);
     _gsourceid = -1;
   }
+}
+
 }
