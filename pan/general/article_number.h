@@ -117,11 +117,8 @@ std::ostream &operator<<(std::ostream &os, Article_Count a);
 class Article_Number {
   public:
     typedef uint64_t type;
-
     Article_Number() : val_(0) {}
-
     explicit Article_Number(type x) : val_(x) {}
-
     explicit Article_Number(StringView const &);
 
     Article_Number(Article_Number const &rhs) = default;
