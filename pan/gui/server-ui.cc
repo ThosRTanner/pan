@@ -1078,6 +1078,6 @@ sec_dialog_new (Data& data, Queue& queue, Prefs& prefs, GtkWindow* parent)
   return d->dialog;
 }
 #endif
-}
 
 }
+

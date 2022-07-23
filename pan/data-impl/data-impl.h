@@ -79,7 +79,6 @@ namespace pan
       DataImpl (const StringView& cache_ext, Prefs& prefs, bool unit_test=false, int cache_megs=10, DataIO * source=new DataIO());
       virtual ~DataImpl ();
       void save_state() override final;
-      void save_state () override;
 
     public:
       ArticleCache& get_cache () override { return _cache; }

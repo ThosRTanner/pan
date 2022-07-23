@@ -57,7 +57,7 @@ Encoder :: Encoder (WorkerPool& pool):
   percent(0.0),
   _worker_pool (pool),
   _gsourceid (-1),
-  health(OK),
+  health(OK)
 {}
 
 
