@@ -33,10 +33,11 @@
 #define PROTOTYPES
 #include <uulib/uudeview.h>
 #include <glib/gi18n.h>
+
 extern "C" {
 #include <sys/stat.h>
 #include <sys/time.h>
-};
+}
 
 #include <pan/general/worker-pool.h>
 #include <pan/general/debug.h>

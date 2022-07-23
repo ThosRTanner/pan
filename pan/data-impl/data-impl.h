@@ -484,10 +484,10 @@ namespace pan
           virtual ~MyTree ();
 
         public: // from ArticleTree
-          virtual void get_children (const Quark& mid, articles_t& setme) const;
-          virtual const Article* get_parent (const Quark& mid) const;
-          virtual const Article* get_article (const Quark& mid) const;
-          virtual size_t size () const;
+          void get_children (const Quark& mid, articles_t& setme) const override;
+          const Article* get_parent (const Quark& mid) const override;
+          const Article* get_article (const Quark& mid) const override;
+          size_t size () const override;
           void set_filter (const ShowType      show_type = SHOW_ARTICLES,
                            const FilterInfo  * criteria  = 0) final override;
           void set_rules  (const ShowType      show_type = SHOW_ARTICLES,
