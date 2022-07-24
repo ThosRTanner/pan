@@ -146,7 +146,9 @@ namespace pan
       void do_read_previous_thread () override;
       void do_read_parent_article () override;
       void do_show_servers_dialog () override;
+#ifdef HAVE_GNUTLS
       void do_show_sec_dialog () override;
+#endif
       void do_collapse_thread () override;
       void do_expand_thread () override;
       void do_show_selected_article_info () override;
