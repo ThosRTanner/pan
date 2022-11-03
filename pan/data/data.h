@@ -40,10 +40,6 @@
 #include <pan/gui/progress-view.h>
 
 #ifdef HAVE_GKR
-#if !GTK_CHECK_VERSION(3,0,0)
-  #include <gnome-keyring-1/gnome-keyring.h>
-  #include <gnome-keyring-1/gnome-keyring-memory.h>
-#endif /* !GTK_CHECK_VERSION(3,0,0) */
 #endif
 
 namespace pan
@@ -232,16 +228,12 @@ namespace pan
 
     public:
 #ifdef HAVE_GKR
-#if GTK_CHECK_VERSION(3,0,0)
       virtual gboolean password_encrypt (const PasswordData&) = 0;
       virtual gchar* password_decrypt (PasswordData&) const = 0;
-#else
-      virtual GnomeKeyringResult password_encrypt (const PasswordData&) = 0;
-      virtual GnomeKeyringResult password_decrypt (PasswordData&) const = 0;
-#endif /* GTK_CHECK_VERSION(3,0,0) */
 #endif
       /** Gets a quark to the provided hostname */
-      virtual bool find_server_by_hn (const std::string& server, Quark& setme) const = 0;
+      bool find_server_by_hn (const std::string& server,
+                              Quark& setme) const override = 0;
 
       virtual const Server* find_server (const Quark& server) const = 0;
 
@@ -253,37 +245,38 @@ namespace pan
 
       virtual Quark add_new_server () = 0;
 
-      virtual void set_server_auth (const Quark       & server,
-                                    const StringView  & username,
-                                    gchar             *&password,
-                                    bool                use_gkr) = 0;
+      void set_server_auth (const Quark       & server,
+                            const StringView  & username,
+                            gchar             *&password,
+                            bool                use_gkr) override = 0;
 
-      virtual void set_server_trust (const Quark      & servername,
-                                     const int          setme) = 0;
+      void set_server_trust (const Quark      & servername,
+                             const int          setme) override = 0;
 
-      virtual void set_server_addr (const Quark       & server,
-                                    const StringView  & address,
-                                    const int           port) = 0;
+      void set_server_addr (const Quark       & server,
+                            const StringView  & address,
+                            const int           port) override = 0;
 
-      virtual void set_server_limits (const Quark     & server,
-                                      int               max_connections) = 0;
+      void set_server_limits (const Quark     & server,
+                              int               max_connections) override = 0;
 
-      virtual bool get_server_addr (const Quark   & server,
-                                    std::string   & setme_address,
-                                    int           & setme_port) const = 0;
+      bool get_server_addr (const Quark   & server,
+                            std::string   & setme_address,
+                            int           & setme_port) const override = 0;
 
-      virtual bool get_server_auth (const Quark   & server,
-                                    std::string   & setme_username,
-                                    gchar         *& setme_password,
-                                    bool            use_gkr) = 0;
+      bool get_server_auth (const Quark   & server,
+                            std::string   & setme_username,
+                            gchar         *& setme_password,
+                            bool            use_gkr) override = 0;
 
-      virtual bool get_server_trust (const Quark  & servername, int&) const = 0;
+      bool get_server_trust (const Quark  & servername, int&) const override = 0;
 
-      virtual bool get_server_compression_type (const Quark  & servername, CompressionType&) const = 0;
+      bool get_server_compression_type (const Quark  & servername,
+                                        CompressionType&) const override = 0;
 
-      virtual std::string get_server_cert (const Quark & server) const = 0;
+      std::string get_server_cert (const Quark & server) const override = 0;
 
-      virtual int get_server_limits (const Quark & server) const = 0;
+      int get_server_limits (const Quark & server) const override = 0;
 
     /*****************************************************************
     ***
@@ -564,10 +557,10 @@ namespace pan
           virtual const Article* get_article (const Quark& mid) const=0;
 
           virtual void set_filter (const ShowType     show_type = SHOW_ARTICLES,
-                                   const FilterInfo * filter_or_null_to_reset = 0) = 0;
+                                   const FilterInfo * filter_or_null_to_reset = nullptr) = 0;
 
           virtual void set_rules (const ShowType     show_type = SHOW_ARTICLES,
-                                   const RulesInfo * filter_or_null_to_reset = 0) = 0;
+                                   const RulesInfo * filter_or_null_to_reset = nullptr) = 0;
       };
 
        /**
@@ -576,8 +569,8 @@ namespace pan
        virtual ArticleTree* group_get_articles (const Quark       & group,
                                                 const Quark       & save_path,  // for auto-download
                                                 const ShowType      show_type = SHOW_ARTICLES,
-                                                const FilterInfo  * criteria = 0,
-                                                const RulesInfo   * rules    = 0) const=0;
+                                                const FilterInfo  * criteria = nullptr,
+                                                const RulesInfo   * rules    = nullptr) const=0;
 
        virtual void group_clear_articles (const Quark& group) = 0;
 

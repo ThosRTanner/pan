@@ -143,7 +143,7 @@ namespace pan
         size_t len_used;
         char * packed_mid;
         Part(): number(0), bytes(0),
-                len_used(0), packed_mid(0) {}
+                len_used(0), packed_mid(nullptr) {}
         Part(number_t n, bytes_t b, size_t l);
         ~Part() { delete [] packed_mid; }
         Part (const Part&);
@@ -158,7 +158,11 @@ namespace pan
       size_t packed_mids_len;
 
     public:
-      void init (const Quark& mid, number_t n_parts=0, number_t n_found=0);
+
+      PartBatch();
+      explicit PartBatch(Quark const &mid, number_t n_parts = 0);
+
+      void init (const Quark& mid, number_t n_parts=0);
       void add_part (number_t num, const StringView& mid, bytes_t bytes);
       void sort ();
   };

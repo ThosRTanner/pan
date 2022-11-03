@@ -12,13 +12,13 @@ libusenetutils_a_SOURCES = \
  mime-utils.cc \
  numbers.cc \
  scorefile.cc \
+ ssl-utils.cc \
  text-massager.cc \
  url-find.cc \
  blowfish.cc \
  gpg.cc
 
 noinst_HEADERS = \
- defgroup.h \
  filter-info.h \
  rules-info.h \
  gnksa.h \
@@ -32,7 +32,7 @@ noinst_HEADERS = \
  blowfish.h \
  blowfish_cyphers.h \
  gpg.h \
- MersenneTwister.h 
+ MersenneTwister.h
 
 #noinst_PROGRAMS = \
 # gnksa-test \

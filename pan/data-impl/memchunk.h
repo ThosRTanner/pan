@@ -20,90 +20,106 @@
 #ifndef __MemChunk_h__
 #define __MemChunk_h__
 
-#include <cstring>
+#include <cstddef>
 
 namespace pan {
-  template <class T> class MemChunk
-  {
-    public:
-      void push_back(const T& src)
-      {
-        if (count==nelem) grow();
-        T* thead=head;
-        new(thead) T(src);
-        phead=thead;
-        ++head;
-        ++count;
-      }
-      T& back()
-      {
-        return *phead;
-      }
-      T* alloc()
-      {
-        push_back(T());
-        return phead;
-      }
 
-      MemChunk():chunks(0),phead(0),head(0),nelem(Chunk::size/sizeof(T)),count(0)
-      {grow();}
-
-      ~MemChunk()
+template <class T> class MemChunk
+{
+  public:
+    void push_back(T const &src)
+    {
+      if (chunks_ == nullptr || chunks_->count_ == chunks_->elements_)
       {
-        Chunk *p;
-        T *t;
-        int i;
-        //special handling for first chunk since it's not full
-        t=reinterpret_cast<T*>(chunks->mem);
-        for (i=0;i<count;i++)
+        grow(nelem);
+      }
+      T *thead = head_;
+      new (thead) T(src);
+      back_ = thead;
+      head_ += 1;
+      chunks_->count_ += 1;
+    }
+
+    T &back()
+    {
+      return *back_;
+    }
+
+    T *alloc()
+    {
+      push_back(T());
+      return back_;
+    }
+
+    MemChunk() :
+      chunks_(nullptr),
+      back_(nullptr),
+      head_(nullptr),
+      allocated_(0)
+    {
+    }
+
+    ~MemChunk()
+    {
+      while (chunks_ != nullptr)
+      {
+        T *t = chunks_->data();
+        for (int i = 0; i < chunks_->count_; i += 1)
         {
           t[i].~T();
         }
-        p=chunks;
-        chunks=chunks->next;
-        delete p;
-
-        while(chunks!=0)
-        {
-          t=reinterpret_cast<T*>(chunks->mem);
-          for (i=0;i<nelem;i++)
-          {
-            t[i].~T();
-          }
-          p=chunks;
-          chunks=chunks->next;
-          delete p;
-        }
+        Chunk *p = chunks_;
+        chunks_ = chunks_->next_;
+        ::operator delete(p);
       }
+    }
 
+    template <class U> MemChunk(MemChunk<U> &) = delete;
+    MemChunk *operator=(MemChunk const &) = delete;
 
-    private:
-      template<class U> MemChunk(MemChunk<U>&);
-      MemChunk* operator=(const MemChunk&);
-
-      struct Chunk {
-        enum {size=16*1024-sizeof(Chunk*)-32};
-        char mem[size];
-        Chunk *next;
-      };
-
-      void grow()
+    /** Ensures there's enough space for the specified number of elements */
+    void reserve(std::size_t elements)
+    {
+      if (elements > allocated_)
       {
-        Chunk *c=new Chunk;
+        grow(elements - allocated_);
+      }
+    }
 
-        memset(c->mem,0,Chunk::size);
+  private:
+    struct Chunk
+    {
+        Chunk *next_;
+        std::size_t elements_;
+        std::size_t count_;
 
-        c->next=chunks;
-        count=0;
-        chunks=c;
-        head=reinterpret_cast<T*>(c->mem);
-      };
+        T *data()
+        {
+          return reinterpret_cast<T *>(this + 1);
+        }
+    };
 
-      Chunk *chunks;
-      T *phead, *head;
-      const int nelem;
-      int count;
-  };
+    void grow(std::size_t elements)
+    {
+      Chunk *c = static_cast<Chunk *>(
+        ::operator new(sizeof(Chunk) + elements * sizeof(T))
+      );
 
-}
+      c->next_ = chunks_;
+      c->elements_ = elements;
+      c->count_ = 0;
+      chunks_ = c;
+      head_ = c->data();
+      allocated_ += elements;
+    };
+
+    enum { nelem = 16 * 1024 };
+
+    Chunk *chunks_;
+    T *back_;
+    T *head_;
+    std::size_t allocated_;
+};
+
+} // namespace pan
 #endif

@@ -71,10 +71,10 @@ namespace pan
                    ArticleCache       & cache,
                    ArticleRead        & read,
                    const ArticleActionType&  mark_read_action,
-                   Progress::Listener* l=0,
+                   Progress::Listener* l=nullptr,
                    SaveMode             save_mode = NONE,
                    const Quark        & save_path = Quark(),
-                   const char         * filename=0,
+                   const char         * filename=nullptr,
                    const SaveOptions  & options=SAVE_ALL);
       virtual ~TaskArticle ();
       time_t get_time_posted () const { return _time_posted; }
@@ -86,8 +86,8 @@ namespace pan
       void set_start_paused (bool val) { _paused = val; }
 
     public: // Task subclass
-      unsigned long get_bytes_remaining () const;
-      void stop ();
+      unsigned long get_bytes_remaining () const override;
+      void stop () override;
 
       /** only call this for tasks in the NEED_DECODE state
        * attempts to acquire the saver thread and start saving
@@ -95,17 +95,17 @@ namespace pan
        * (intended to be used with the Queue class). If true is returned,
        * a side-effect is that the task is now in the DECODING state.
        */
-      virtual void use_decoder (Decoder*);
+      void use_decoder (Decoder*) override;
 
     private: // Task subclass
-      virtual void use_nntp (NNTP * nntp);
+      void use_nntp (NNTP * nntp) override;
 
     private: // NNTP::Listener subclass
-      virtual void on_nntp_line  (NNTP*, const StringView&);
-      virtual void on_nntp_done  (NNTP*, Health, const StringView&);
+      void on_nntp_line  (NNTP*, const StringView&) override;
+      void on_nntp_done  (NNTP*, Health, const StringView&) override;
 
     private: // WorkerPool::Listener interface
-      void on_worker_done (bool cancelled);
+      void on_worker_done (bool cancelled) override;
 
     protected:
       Quark _save_path;
@@ -144,13 +144,13 @@ namespace pan
         void reset() {
           buf_t tmp;
           buf.swap (tmp); // deallocates space
-          nntp = 0;
+          nntp = nullptr;
         }
       };
       typedef std::vector<Needed> needed_t;
       needed_t _needed;
 
-      void update_work (NNTP* checkin_pending=0);
+      void update_work (NNTP* checkin_pending=nullptr);
   };
 }
 

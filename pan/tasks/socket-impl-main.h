@@ -62,8 +62,8 @@ namespace pan {
 
 #ifdef HAVE_GNUTLS
       // CertStore::Listener
-      virtual void on_verify_cert_failed(gnutls_x509_crt_t, std::string, int) override;
-      virtual void on_valid_cert_added (gnutls_x509_crt_t, std::string ) override;
+      void on_verify_cert_failed(gnutls_x509_crt_t, std::string, int) override;
+      void on_valid_cert_added (gnutls_x509_crt_t, std::string ) override;
 #endif
       Data& data;
       CertStore & store;

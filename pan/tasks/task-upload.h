@@ -80,8 +80,8 @@ namespace pan
         std::string mid; // for rng
         std::string cachename;
         Xref xref;
-        Needed (): nntp(0), bytes(0) , partno(1) {}
-        void reset() { nntp = 0; }
+        Needed (): nntp(nullptr), bytes(0) , partno(1) {}
+        void reset() { nntp = nullptr; }
       };
 
       typedef std::map<int, Needed> needed_t;
@@ -92,14 +92,14 @@ namespace pan
                    EncodeCache               & cache,
                    Article                     article,
                    UploadInfo                  format,
-                   GMimeMessage *              msg=0,
-                   Progress::Listener        * listener= 0);
+                   GMimeMessage *              msg=nullptr,
+                   Progress::Listener        * listener= nullptr);
 
       virtual ~TaskUpload ();
 
     public: // Task subclass
-      unsigned long get_bytes_remaining () const;
-      void stop ();
+      unsigned long get_bytes_remaining () const override;
+      void stop () override;
       const std::string& get_basename()  { return  _basename; }
 
       /** only call this for tasks in the NEED_ENCODE state
@@ -108,17 +108,17 @@ namespace pan
        * (intended to be used with the Queue class). If true is returned,
        * a side-effect is that the task is now in the ENCODING state.
        */
-    virtual void use_encoder (Encoder*);
+      void use_encoder (Encoder*) override;
 
     private: // Task subclass
-      virtual void use_nntp (NNTP * nntp);
+      void use_nntp (NNTP * nntp) override;
 
     private: // NNTP::Listener subclass
-      virtual void on_nntp_line  (NNTP*, const StringView&);
-      virtual void on_nntp_done  (NNTP*, Health, const StringView&);
+      void on_nntp_line  (NNTP*, const StringView&) override;
+      void on_nntp_done  (NNTP*, Health, const StringView&) override;
 
     private: // WorkerPool::Listener interface
-      void on_worker_done (bool cancelled);
+      void on_worker_done (bool cancelled) override;
 
     protected:
       Quark _server;
@@ -156,13 +156,13 @@ namespace pan
       bool _first;
       std::string _groups;
 
-      void update_work (NNTP * checkin_pending = 0);
+      void update_work (NNTP * checkin_pending = nullptr);
 
     public:
       void set_encoder_done (bool setme) { _encoder_has_run = setme; }
       needed_t& needed() { return _needed; }
       void build_needed_tasks();
-      void wakeup() { _state.set_working(); update_work(); }
+      void wakeup() override { _state.set_working(); update_work(); }
   };
 }
 

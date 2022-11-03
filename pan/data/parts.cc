@@ -20,10 +20,11 @@
 #include "parts.h"
 
 #include <config.h>
+#ifdef DEBUG
 #include <cassert>
+#include <string>
+#endif
 #include <algorithm>
-#include <pan/general/debug.h>
-#include <pan/general/macros.h>
 #include <pan/general/string-view.h>
 
 #undef DEBUG
@@ -134,7 +135,7 @@ Parts :: Parts ():
   n_parts_total (0),
   part_mid_buf_len (0),
   parts (0),
-  part_mid_buf (0)
+  part_mid_buf (nullptr)
 {
 }
 
@@ -145,7 +146,7 @@ Parts :: clear ()
   parts.swap(tmp);
 
   delete [] part_mid_buf;
-  part_mid_buf = 0;
+  part_mid_buf = nullptr;
 
   part_mid_buf_len = 0;
   n_parts_total = 0;
@@ -155,7 +156,7 @@ Parts :: Parts (const Parts& that):
   n_parts_total (0),
   part_mid_buf_len (0),
   parts (0),
-  part_mid_buf (0)
+  part_mid_buf (nullptr)
 {
   *this = that;
 }
@@ -281,15 +282,30 @@ Parts :: add_part (number_t            num,
 *****
 ****/
 
+PartBatch::PartBatch() :
+  n_parts_found(0),
+  n_parts_total(0),
+  packed_mids_len(0)
+{
+}
+
+PartBatch::PartBatch(Quark const &mid, number_t parts_total) :
+  reference_mid(mid),
+  n_parts_found(0),
+  n_parts_total(parts_total),
+  packed_mids_len(0)
+{
+  parts.reserve(n_parts_total);
+}
+
 void
 PartBatch :: init (const Quark  & mid,
-                   number_t       n_parts_total,
-                   number_t       n_parts_found UNUSED )
+                   number_t       parts_total)
 {
-  this->reference_mid = mid;
-  this->packed_mids_len = 0;
-  this->n_parts_total = n_parts_total;
-  this->n_parts_found = 0; // they haven't been added yet
+  reference_mid = mid;
+  packed_mids_len = 0;
+  n_parts_total = parts_total;
+  n_parts_found = 0; // they haven't been added yet
 
   parts.clear();
   parts.reserve(n_parts_total);
@@ -352,7 +368,7 @@ PartBatch :: Part :: Part (number_t n, bytes_t b, size_t l):
 }
 
 void
-PartBatch :: sort (void)
+PartBatch :: sort ()
 {
   std::sort (parts.begin (), parts.end ());
 }
