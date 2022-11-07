@@ -107,9 +107,8 @@ ProgressView :: on_progress_status_idle (gpointer self_gpointer)
   }
   else
     gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR(self->_progressbar), false);
-#endif
   const char* tmp = iconv_inited ? g_mime_iconv_strdup(conv,status.c_str()) : nullptr;
-  
+
   if (tmp) { status = tmp; g_free((char*)tmp); }
 
   gtk_progress_bar_set_text (GTK_PROGRESS_BAR(self->_progressbar), status.c_str());
