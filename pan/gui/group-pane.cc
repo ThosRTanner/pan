@@ -159,9 +159,7 @@ GroupPane ::  do_popup_menu (GtkWidget*, GdkEventButton *event, gpointer pane_g)
 {
   GroupPane * self (static_cast<GroupPane*>(pane_g));
   GtkWidget * menu (self->_action_manager.get_action_widget ("/group-pane-popup"));
-  gtk_menu_popup (GTK_MENU(menu), NULL, NULL, NULL, NULL,
-                  (event ? event->button : 0),
-                  (event ? event->time : 0));
+  gtk_menu_popup_at_pointer (GTK_MENU(menu),(GdkEvent*) event);
 }
 
 namespace
@@ -613,27 +611,7 @@ namespace
                                      GdkEventFocus * ,
                                      gpointer        )
   {
-    gtk_widget_override_color(w, GTK_STATE_FLAG_NORMAL, NULL);
     set_search_entry (w, search_text.c_str());
-    return false;
-  }
-
-  void refresh_search_entry (GtkWidget * w)
-  {
-    if (search_text.empty() && !gtk_widget_has_focus(w))
-    {
-      GdkRGBA c;
-      gdk_rgba_parse (&c, "0xAAA");
-      gtk_widget_override_color(w, GTK_STATE_FLAG_NORMAL, &c);
-      set_search_entry (w, _(mode_strings[mode]));
-    }
-  }
-
-  gboolean search_entry_focus_out_cb (GtkWidget     * w,
-                                      GdkEventFocus * ,
-                                      gpointer        )
-  {
-    refresh_search_entry (w);
     return false;
   }
 
@@ -657,10 +635,10 @@ namespace
     remove_activate_soon_tag ();
   }
 
-  void entry_icon_released (GtkEntry*, GtkEntryIconPosition icon_pos, GdkEventButton *, gpointer menu)
+  void entry_icon_released (GtkEntry*, GtkEntryIconPosition icon_pos, GdkEventButton* event, gpointer menu)
   {
     if (icon_pos == GTK_ENTRY_ICON_PRIMARY)
-      gtk_menu_popup (GTK_MENU(menu), nullptr, nullptr, nullptr, nullptr, 0, gtk_get_current_event_time());
+      gtk_menu_popup_at_pointer (GTK_MENU(menu), (GdkEvent*) event);
   }
 
   void clear_button_clicked_cb (GtkEntry * e, GtkEntryIconPosition icon_pos, GdkEventButton *, gpointer pane_gpointer)
@@ -668,7 +646,6 @@ namespace
     if (icon_pos == GTK_ENTRY_ICON_SECONDARY)
     {
       set_search_entry (GTK_WIDGET(e), "");
-      refresh_search_entry (GTK_WIDGET(e));
       search_text.clear ();
       search_entry_activated (NULL, pane_gpointer);
     }
@@ -701,7 +678,6 @@ namespace
     if (gtk_check_menu_item_get_active  (menu_item))
     {
       mode = GPOINTER_TO_INT (g_object_get_data (G_OBJECT(menu_item), "MODE"));
-      refresh_search_entry (GTK_WIDGET(entry_g));
       GroupPane * h = (GroupPane*) g_object_get_data (
                                              G_OBJECT(entry_g), "group-pane");
       bump_activate_soon_tag (h);
@@ -916,16 +892,15 @@ GroupPane :: create_filter_entry ()
 {
   GtkWidget * entry = gtk_entry_new ();
   g_object_set_data (G_OBJECT(entry), "group-pane", this);
-  gtk_entry_set_icon_from_stock( GTK_ENTRY( entry ),
-                                 GTK_ENTRY_ICON_SECONDARY,
-                                 GTK_STOCK_CLEAR );
-  gtk_entry_set_icon_from_stock( GTK_ENTRY( entry ),
-                                 GTK_ENTRY_ICON_PRIMARY,
-                                 GTK_STOCK_FIND );
+  gtk_entry_set_icon_from_icon_name( GTK_ENTRY( entry ),
+                                     GTK_ENTRY_ICON_SECONDARY,
+                                     "edit-clear" );
+  gtk_entry_set_icon_from_icon_name( GTK_ENTRY( entry ),
+                                     GTK_ENTRY_ICON_PRIMARY,
+                                     "edit-find" );
 //  gtk_widget_set_size_request (entry, 133, -1);
   _action_manager.disable_accelerators_when_focused (entry);
   g_signal_connect (entry, "focus-in-event", G_CALLBACK(search_entry_focus_in_cb), NULL);
-  g_signal_connect (entry, "focus-out-event", G_CALLBACK(search_entry_focus_out_cb), NULL);
   g_signal_connect (entry, "activate", G_CALLBACK(search_entry_activated), this);
   g_signal_connect (entry, "icon-release", G_CALLBACK(clear_button_clicked_cb), this);
   entry_changed_tag = g_signal_connect (entry, "changed", G_CALLBACK(search_entry_changed_by_user), this);
@@ -950,7 +925,6 @@ GroupPane :: create_filter_entry ()
   }
   g_signal_connect (entry, "icon-release", G_CALLBACK(entry_icon_released), menu);
 
-  refresh_search_entry (entry);
   return entry;
 }
 
@@ -1082,6 +1056,9 @@ GroupPane :: ~GroupPane ()
 void
 GroupPane :: refresh_font ()
 {
+  // TODO: cleanup calls to gtk_widget_override_font. This requires
+  // changing font with CSS. This impact how to set preferences->Font
+  // item
   if (!_prefs.get_flag ("group-pane-font-enabled", false))
     gtk_widget_override_font (_tree_view, nullptr);
   else {

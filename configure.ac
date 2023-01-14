@@ -1,8 +1,8 @@
-AC_INIT([Pan],[0.151],[https://gitlab.gnome.org/GNOME/pan/issues],[pan],[http://pan.rebelbase.com/])
+AC_INIT([Pan],[0.154],[https://gitlab.gnome.org/GNOME/pan/issues],[pan],[https://gitlab.gnome.org/GNOME/pan])
 AC_DEFINE(VERSION_MAJOR,0,[Major part of version number])
-AC_DEFINE(VERSION_MINOR,151,[Minor part of version number])
+AC_DEFINE(VERSION_MINOR,154,[Minor part of version number])
 AC_DEFINE(VERSION_REVISION,0,[Revision part of version number])
-AC_DEFINE(VERSION_TITLE,["Butcha"],[Release Name])
+AC_DEFINE(VERSION_TITLE,["Izium"],[Release Name])
 AC_PREREQ([2.71])
 
 dnl Get git info for pan-git.version
@@ -158,26 +158,14 @@ AC_SUBST(ENCHANT_LIBS)
 dnl WebKitGTK support
 AC_ARG_WITH([webkit],
   AS_HELP_STRING([--with-webkit],[enable WebKitGTK support (experimental, normally: no)]), [want_webkit=$withval], [want_webkit=no])
-if test "x$want_gtk2" = "xyes" ; then
-  if test "x$want_webkit" = "xyes" ; then
-    PKG_CHECK_MODULES([WEBKITGTK], [webkitgtk-1.0 >= $WEBKIT_REQUIRED],
-    [
-    AC_DEFINE(HAVE_WEBKIT,[1],[WebKit support (1.0) for embedded HTML])
-    ],
-    [
-    AC_MSG_RESULT(no)
-    ])
-  fi
-else
-  if test "x$want_webkit" = "xyes" ; then
-    PKG_CHECK_MODULES([WEBKITGTK],[webkitgtk-3.0 >= $WEBKIT_REQUIRED],
-    [
-    AC_DEFINE(HAVE_WEBKIT,[1],[WebKit support (3.0) for embedded HTML])
-    ],
-    [
-    AC_MSG_RESULT(no)
-    ])
-  fi
+if test "x$want_webkit" = "xyes" ; then
+  PKG_CHECK_MODULES([WEBKITGTK],[webkitgtk-3.0 >= $WEBKIT_REQUIRED],
+  [
+  AC_DEFINE(HAVE_WEBKIT,[1],[WebKit support (3.0) for embedded HTML])
+  ],
+  [
+  AC_MSG_RESULT(no)
+  ])
 fi
 
 dnl GnuTLS support
@@ -209,25 +197,17 @@ if test "x$enable_libnotify" = "xyes" ; then
   AC_SUBST([LIBNOTIFY_LIBS])
 fi
 
-dnl Check for libsecret and gcr (GTK 3 only) or GNOME Keyring if user-enabled for password storage
+dnl Check for libsecret and gcr if user-enabled for password storage
 AC_ARG_ENABLE([gkr],
   AS_HELP_STRING([--enable-gkr],[enable GNOME Keyring or libsecret support (normally: no)]),[enable_gkr=$enableval],[enable_gkr=no])
 if test "x$enable_gkr" = "xyes" ; then
-  if test "x$want_gtk2" = "xyes" ; then
-    PKG_CHECK_MODULES([LIBGNOME_KEYRING_1],[gnome-keyring-1 >= $LIBGKR_REQUIRED],
-    [LIBSECRET_VER=`pkg-config --modversion gnome-keyring-1`
-    gkr_msg="yes ($LIBSECRET_VER)"
-    AC_DEFINE(HAVE_GKR,[1],[GNOME Keyring or libsecret support for password storage])],
-    [gkr_msg=no
-    AC_MSG_RESULT(no)])
-  else
-    PKG_CHECK_MODULES([LIBGNOME_KEYRING_1],[libsecret-1 >= $LIBSECRET_REQUIRED gcr-3 >= $GCR_REQUIRED],
-    [LIBSECRET_VER=`pkg-config --modversion libsecret-1 gcr-3 | xargs`
-    gkr_msg="yes ($LIBSECRET_VER)"
-    AC_DEFINE(HAVE_GKR,[1],[GNOME Keyring or libsecret support for password storage])],
-    [gkr_msg=no
-    AC_MSG_RESULT(no)])
-  fi
+  PKG_CHECK_MODULES([LIBGNOME_KEYRING_1],[libsecret-1 >= $LIBSECRET_REQUIRED gcr-3 >= $GCR_REQUIRED],
+  [LIBSECRET_VER=`pkg-config --modversion libsecret-1 gcr-3 | xargs`
+  gkr_msg="yes ($LIBSECRET_VER)"
+  AC_DEFINE(HAVE_GKR,[1],[GNOME Keyring or libsecret support for password storage])],
+  [gkr_msg=no
+  AC_MSG_RESULT(no)])
+
   AC_SUBST([LIBGNOME_KEYRING_1_CFLAGS])
   AC_SUBST([LIBGNOME_KEYRING_1_LIBS])
 fi

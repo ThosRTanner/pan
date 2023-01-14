@@ -2,7 +2,7 @@
 
 This is Pan, a powerful and user-friendly Usenet newsreader for GTK.
 The latest information and versions of Pan can always be found at
-[[http://pan.rebelbase.com/][Pan website]].
+[[https://gitlab.gnome.org/GNOME/pan][Pan website]].
 
 ** THE SALES PITCH
 
@@ -47,9 +47,7 @@ Pan is good at Binaries.
   for enhanced privacy and security.
 - Connections can be encrypted with the TLS protocol.
 
-The rest of the sales pitch is at [[http://pan.rebelbase.com/features/][Pan features page]].
-
-** RELEASE NOTES
+** Release Notes
 
 - You are advised to back up your $PAN_HOME directory (by default,
   =$HOME/.pan2=) before upgrading Pan.
@@ -66,7 +64,7 @@ The rest of the sales pitch is at [[http://pan.rebelbase.com/features/][Pan feat
   Pan with support for that feature, and then enable it in Edit ->
   Preferences -> Miscellaneous -> 'Save passwords in password storage'.
 
-** REQUIREMENTS
+** Requirements
 
 Pan requires these libraries:
 
@@ -78,12 +76,9 @@ Pan requires these libraries:
 The following libraries add extra features but are optional:
 
 - [[http://gtkspell.sourceforge.net][GtkSpell 3]] 2.0.16 or higher for spellchecker support
-  (GtkSpell 2.0.7 or higher when using GTK 2)
 - [[http://www.abisource.com/projects/enchant/][Enchant]] 2.2.3 or higher for spellchecker support
-  (Enchant 1.6.0 or higher when using GTK 2)
 - [[http://www.galago-project.org/news/index.php][libnotify]] 0.4.1 or higher for notifications
 - [[https://developer.gnome.org/libsecret/][libsecret]] 0.16 or higher and [[https://developer.gnome.org/gcr/][gcr]] 3.20 or higher for password storage
-  ([[https://wiki.gnome.org/Projects/GnomeKeyring][GNOME Keyring]] 3.2.0 or higher when using GTK 2)
 - [[http://www.freedesktop.org/wiki/Software/dbus][D-Bus]] to support running multiple Pan instances
 - [[http://www.gnu.org/software/gnutls/][GnuTLS]] 3.0.0 or higher for encrypted connections (TLS 1.x)
 - [[https://wiki.gnome.org/Apps/Yelp/Tools][Yelp Tools]] for built-in user manual
@@ -100,7 +95,7 @@ enable or disable at configure (or autogen) time:
   ./configure --help
 #+end_src
 
-* INSTALLATION
+* Installation
 
 Run the following command to build Pan configured with the default options:
 
@@ -125,27 +120,49 @@ Finally, run the following command as root to install Pan:
 make install
 #+end_src
 
-* UPGRADING
+* Upgrading
 
 Upgrading typically requires that you do the exact same procedure as when
 installing Pan.
 
-* HOW TO REPORT BUGS
+* How to report bugs
 
 For details on how to report bugs, see [[http://pan.rebelbase.com/bugs/][Pan bug report page]].
 
-* CONTACT
+* Help Wanted
+
+Several areas are in need of work:
+
+- Pan still contains a lot of GTK2 code which triggers a lot of
+  warnings. I'd welcome patches there.
+- The [[https://gitlab.gnome.org/GNOME/pan/-/wikis/home][Wiki page]] on Gitlab is empty. Help is welcome there.
+
+* Contact
+
+** Mailing lists
 
 To get in touch with Pan contributors and community members, subscribe
-to one of the Pan mailing lists. For more information, see [[http://pan.rebelbase.com/mailing_lists/][Pan mailing
-lists]].
+to one of the Pan mailing lists.
 
-You can also chat with other community members on =irc.freenode.net=,
-channel =#pan=.
+- [[http://lists.nongnu.org/mailman/listinfo/pan-announce][pan-announce]] :: This is a low-traffic list for announcements of new
+  Pan releases.
+- [[http://lists.nongnu.org/mailman/listinfo/pan-users][pan-users]] :: This is a high-traffic list for feature requests, user
+  questions, bug reports, and most everything else.
+- [[http://lists.nongnu.org/mailman/listinfo/pan-devel][pan-devel]] :: A developers' forum to discuss hacking on Pan's source
+  code. New developers are welcome.
 
-* LINKS
+And a big thank-you goes to Savannah for hosting these lists.
 
-- [[http://pan.rebelbase.com/][Pan]]
+** Newsgroups
+
+Pan mailing lists can also be accessed through the Gmane email to news gateway:
+
+- gmane.comp.gnome.apps.pan.announce
+- gmane.comp.gnome.apps.pan.user
+- gmane.comp.gnome.apps.pan.devel
+
+* Links
+
 - [[http://www.gtk.org/][GTK]]
 - [[http://www.gnome.org/][GNOME]]
 - [[http://www.gnu.org/][GNU]]
